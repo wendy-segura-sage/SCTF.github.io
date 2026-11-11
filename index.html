@@ -1,32 +1,384 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Where's Wally?</title>
-    <style>
-      body {
-        margin: 0;
-        padding: 24px;
-        background: #f5f5f5;
-        color: #222;
-        font-family: Arial, sans-serif;
-        text-align: center;
-      }
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="A crowded beach, a familiar explorer, and a hidden discovery.">
+  <meta name="theme-color" content="#cf3341">
+  <title>Where's Wally? | The Beach Search</title>
 
-      img {
-        display: block;
-        max-width: 100%;
-        height: auto;
-        margin: 0 auto;
-      }
-    </style>
-  </head>
-  <body>
-    <main>
-      <h1>Where's Wally?</h1>
-      <img src="Images/Where%27s-Wally.jpg" alt="A crowded beach scene in the Where's Wally challenge." width="1024" height="768">
-      <!-- SCTF{You-Found-Wally} -->
-    </main>
-  </body>
+  <style>
+    :root {
+      --red: #cf3341;
+      --navy: #20324b;
+      --cream: #fff9eb;
+      --sand: #f0dfb7;
+      --muted: #596575;
+      --border: #ded8c9;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: var(--cream);
+      color: var(--navy);
+      font-family: Arial, sans-serif;
+      line-height: 1.6;
+    }
+
+    .stripes {
+      height: 16px;
+      background: repeating-linear-gradient(
+        90deg,
+        var(--red) 0 28px,
+        #fff 28px 56px
+      );
+    }
+
+    .container {
+      width: min(1120px, 92%);
+      margin: 0 auto;
+    }
+
+    header {
+      padding: 22px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .header-inner,
+    .section-heading,
+    .image-caption {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .brand {
+      color: var(--navy);
+      font-size: 20px;
+      font-weight: 800;
+      text-decoration: none;
+    }
+
+    nav {
+      display: flex;
+      gap: 20px;
+    }
+
+    nav a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 14px;
+    }
+
+    nav a:hover { color: var(--red); }
+
+    a:focus-visible,
+    summary:focus-visible {
+      outline: 3px solid var(--red);
+      outline-offset: 5px;
+    }
+
+    .hero {
+      padding: 56px 0 32px;
+      text-align: center;
+    }
+
+    .eyebrow {
+      color: var(--red);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 12px 0;
+      font-size: clamp(38px, 7vw, 76px);
+      line-height: 1.1;
+    }
+
+    h2 { margin-top: 0; }
+
+    .intro {
+      max-width: 600px;
+      margin: 18px auto;
+      color: var(--muted);
+    }
+
+    .rhyme {
+      margin: 24px auto;
+      font-family: Georgia, serif;
+      font-size: clamp(17px, 3vw, 21px);
+      font-style: italic;
+    }
+
+    .badges {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 28px;
+    }
+
+    .badge {
+      padding: 6px 13px;
+      border: 1px solid var(--border);
+      border-radius: 99px;
+      background: #fff;
+      font-size: 12px;
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+      margin: 30px 0;
+    }
+
+    .card,
+    .scene,
+    .field-notes {
+      padding: 24px;
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+    }
+
+    .card-number {
+      color: var(--red);
+      font-size: 12px;
+      font-weight: bold;
+      letter-spacing: 2px;
+    }
+
+    .card h3 { margin: 10px 0 6px; }
+
+    .card p,
+    .field-notes p {
+      margin-bottom: 0;
+      color: var(--muted);
+    }
+
+    .section-heading { margin-bottom: 20px; }
+    .section-heading h2 { margin: 0; }
+
+    .scene-label {
+      font-size: 12px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
+
+    .scene img {
+      display: block;
+      width: 100%;
+      height: auto;
+      border-radius: 6px;
+      background: var(--sand);
+    }
+
+    .image-caption {
+      margin-top: 14px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .field-notes {
+      margin: 28px 0;
+      background: #f7edd6;
+    }
+
+    .checklist {
+      display: flex;
+      gap: 14px 28px;
+      flex-wrap: wrap;
+      margin-top: 20px;
+    }
+
+    .checklist label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+    }
+
+    input[type="checkbox"] { accent-color: var(--red); }
+
+    details {
+      margin: 28px 0;
+      padding: 20px 24px;
+      border: 1px dashed var(--muted);
+      border-radius: 12px;
+    }
+
+    summary {
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    details p { color: var(--muted); }
+
+    footer {
+      padding: 26px 0;
+      border-top: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 12px;
+      text-align: center;
+    }
+
+    @media (max-width: 700px) {
+      .cards { grid-template-columns: 1fr; }
+      .hero { padding-top: 36px; }
+      .scene { padding: 12px; }
+      .section-heading { padding: 8px; }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Site header and primary navigation -->
+  <div class="stripes" aria-hidden="true"></div>
+
+  <header>
+    <div class="container header-inner">
+      <a class="brand" href="#top">THE GREAT BEACH SEARCH</a>
+      <nav aria-label="Main navigation">
+        <a href="#challenge">The challenge</a>
+        <a href="#scene">The scene</a>
+        <a href="#notes">Field notes</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="top" class="container">
+    <!-- Challenge introduction -->
+    <section class="hero" id="challenge" aria-labelledby="page-title">
+      <div class="eyebrow">SCTF · Observation Department</div>
+      <h1 id="page-title">Where Is Wally?</h1>
+
+      <p class="intro">
+        One crowded beach. Countless distractions.
+        Look closely—there may be more to discover than a striped shirt.
+      </p>
+
+      <p class="rhyme">
+        Search for Wally, dressed in red,<br>
+        But seek the flag beneath instead.<br>
+        Beyond the picture, secrets show,<br>
+        Unveil the source to claim your glow.
+      </p>
+
+      <div class="badges" aria-label="Challenge information">
+        <span class="badge">Category: Discovery</span>
+        <span class="badge">Location: The beach</span>
+        <span class="badge">Equipment: Curiosity</span>
+        <span class="badge">Status: Awaiting discovery</span>
+      </div>
+    </section>
+
+    <!-- Search guide -->
+    <section class="cards" aria-label="Search guide">
+      <article class="card">
+        <span class="card-number">01 / OBSERVE</span>
+        <h3>Take in the scene</h3>
+        <p>
+          Umbrellas, towels, swimmers, and sandcastles.
+          Start with the big picture before exploring the details.
+        </p>
+      </article>
+
+      <article class="card">
+        <span class="card-number">02 / INVESTIGATE</span>
+        <h3>Follow your curiosity</h3>
+        <p>
+          A familiar pattern can catch your eye.
+          Keep track of what you find and question what you overlook.
+        </p>
+      </article>
+
+      <article class="card">
+        <span class="card-number">03 / DISCOVER</span>
+        <h3>Look a little deeper</h3>
+        <p>
+          Every scene has layers.
+          Sometimes the most useful discovery sits beneath the surface.
+        </p>
+      </article>
+    </section>
+
+    <!-- Main illustration -->
+    <section class="scene" id="scene" aria-labelledby="scene-title">
+      <div class="section-heading">
+        <h2 id="scene-title">A day at the beach</h2>
+        <span class="scene-label">Observation area · 001</span>
+      </div>
+
+      <img
+        src="Images/Where%27s-Wally.jpg"
+        alt="A crowded beach scene in the Where's Wally challenge."
+        width="1024"
+        height="768"
+      >
+
+      <div class="image-caption">
+        <span>Field of view: wonderfully crowded</span>
+        <span>Take your time. Details matter.</span>
+      </div>
+    </section>
+
+    <!-- Supplemental observation notes -->
+    <section class="field-notes" id="notes" aria-labelledby="notes-title">
+      <span class="eyebrow">Explorer's notebook</span>
+      <h2 id="notes-title">Things to keep an eye on</h2>
+      <p>
+        A good explorer keeps a record. Use this checklist as you work
+        through the scene—your observations are yours to make.
+      </p>
+
+      <div class="checklist">
+        <label>
+          <input type="checkbox">
+          Striped shirts
+        </label>
+        <label>
+          <input type="checkbox">
+          Beach umbrellas
+        </label>
+        <label>
+          <input type="checkbox">
+          Unusual details
+        </label>
+        <label>
+          <input type="checkbox">
+          Something beneath the surface
+        </label>
+      </div>
+    </section>
+
+    <!-- SCTF{You-Found-Wally} -->
+
+    <!-- Optional guidance -->
+    <details>
+      <summary>Need a small nudge?</summary>
+      <p>
+        Finding Wally and finding the flag are two different discoveries.
+        Read the rhyme again: which word suggests where to look next?
+      </p>
+    </details>
+  </main>
+
+  <!-- Closing information -->
+  <footer>
+    <div class="container">
+      <p>The Great Beach Search · SCTF Challenge</p>
+      <p>Stay curious. Look closely. Enjoy the hunt.</p>
+    </div>
+  </footer>
+
+  <div class="stripes" aria-hidden="true"></div>
+</body>
 </html>
